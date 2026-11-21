@@ -14,14 +14,14 @@ Chacun existe en 4 thèmes : `aritim` (palette Aritim Dark de Konsole), `dark`, 
 ```
 .
 ├── src/
-│   ├── build_vim_regex.py   # contenu + mise en page Vim/Regex
-│   ├── build_git_linux.py   # contenu + mise en page Git/Linux
-│   ├── common.py            # rendu partagé (lignes, panneaux, badges)
-│   └── render.py            # HTML → PNG 1440p et 4K, détection des débordements
+│   ├── build_vim_regex.py           # Vim + Regex (mise en page dédiée)
+│   ├── build_git_linux.py           # Git + Linux
+│   ├── common.py                    # rendu partagé, gabarit « deux zones », thèmes de base
+│   └── render.py                    # HTML → PNG 1440p et 4K, détection des débordements
 ├── wallpapers/
-│   ├── 1440p/               # 2560×1440
-│   └── 4k/                  # 3840×2160
-├── build/html/              # pages HTML intermédiaires (généré, ignoré par git)
+│   ├── 1440p/                       # 2560×1440
+│   └── 4k/                          # 3840×2160
+├── build/html/                      # pages HTML intermédiaires (généré, ignoré par git)
 ├── Makefile
 └── requirements.txt
 ```
@@ -43,7 +43,7 @@ après une modification du contenu, raccourcir la ligne ou retirer une entrée.
 
 ## Modifier le contenu
 
-Les listes de commandes sont en tête de `src/build_vim_regex.py` et `src/build_git_linux.py`.
+Les listes de commandes sont en tête de chaque `src/build_*.py`.
 Chaque panneau : `(titre, étiquette, largeur colonne commande en px ou None, lignes)`.
 
 Conventions dans les lignes (voir `src/common.py`) :
@@ -55,7 +55,13 @@ Conventions dans les lignes (voir `src/common.py`) :
 | `"⚠ desc"`           | commande destructive                        |
 | `"desc [GNU]"`       | badge de compatibilité en fin de ligne      |
 
-Les thèmes sont des variables CSS dans le dictionnaire `THEMES` de chaque script.
+Thèmes : les couleurs de fond et de texte sont dans `BASE_THEMES` (`src/common.py`) ; chaque
+script n'ajoute que ses accents dans `ACCENTS` (`--a` zone gauche, `--b` zone droite, `--param`).
+Vim/Regex garde son propre dictionnaire `THEMES`.
+
+Nouveau fond d'écran : copier un script à gabarit « deux zones » (par ex. `src/build_git_linux.py`),
+changer le contenu, les accents et le slug,
+puis l'ajouter à la cible `html` du `Makefile`.
 
 ## Polices
 

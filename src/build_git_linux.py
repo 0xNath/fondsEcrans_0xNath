@@ -9,12 +9,7 @@ par "⚠ " est marquée comme destructive.
 Panneau : (titre, étiquette ou "", largeur colonne commande en px ou None, lignes)
 Côté Git, le préfixe « git » est omis.
 """
-import html
-import re
-from pathlib import Path
-
-ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "build" / "html"
+from common import build_two_zones
 
 GIT = [
     [  # colonne 1
@@ -248,34 +243,12 @@ LINUX = [
     ],
 ]
 
-THEMES = {
-    # Aritim Dark (palette Plasma de Mrcuve0/Aritim-Dark)
-    "aritim": """
-  --bg:#10151a; --bg2:#141a21; --grid:rgba(146,152,165,.04);
-  --panel:rgba(20,26,33,.96); --border:#2f343f;
-  --text:#d3dae3; --text2:#bcc3ce; --muted:#9298a5; --hl:rgba(43,82,120,.45); --warn:#da4453;
-  --a:#f67400; --b:#27ae60; --param:#5d88ca;""",
-    "dark": """
-  --bg:#0c1220; --bg2:#111a2d; --grid:rgba(140,170,220,.05);
-  --panel:rgba(19,28,46,.94); --border:rgba(130,160,210,.16);
-  --text:#cdd5e3; --text2:#b3bccb; --muted:#8792a8; --hl:rgba(255,255,255,.075);
-  --a:#ff8f6b; --b:#6fd3e6; --param:#c6a8ff; --warn:#ff6ad5;""",
-    "light": """
-  --bg:#f2eee5; --bg2:#e9e4d8; --grid:rgba(60,70,90,.06);
-  --panel:rgba(252,250,245,.96); --border:rgba(60,70,90,.16);
-  --text:#1c2230; --text2:#3a4152; --muted:#5a6273; --hl:rgba(30,40,60,.07);
-  --a:#b23a17; --b:#0a6678; --param:#6a3fb5; --warn:#b0128a;""",
-    "amoled": """
-  --bg:#000000; --bg2:#000000; --grid:transparent;
-  --panel:#000000; --border:#232a33;
-  --text:#aab2be; --text2:#929aa7; --muted:#6f7886; --hl:#14171c;
-  --a:#e57a59; --b:#58b5c7; --param:#a98fe6; --warn:#d85cb8;""",
+ACCENTS = {
+    "aritim": "--a:#f67400; --b:#27ae60; --param:#5d88ca;",
+    "dark":   "--a:#ff8f6b; --b:#6fd3e6; --param:#c6a8ff;",
+    "light":  "--a:#b23a17; --b:#0a6678; --param:#6a3fb5;",
+    "amoled": "--a:#e57a59; --b:#58b5c7; --param:#a98fe6;",
 }
-
-
-from common import CSS as COMMON_CSS, rows_html, columns
-
-
 
 BRANCH_SVG = """<svg class="graph" viewBox="0 0 120 48" aria-hidden="true">
   <path d="M8 34 H112" stroke="var(--a)" stroke-width="3" fill="none"/>
@@ -285,75 +258,11 @@ BRANCH_SVG = """<svg class="graph" viewBox="0 0 120 48" aria-hidden="true">
   <circle cx="102" cy="34" r="7" fill="var(--bg)" stroke="var(--a)" stroke-width="3"/>
 </svg>"""
 
-TEMPLATE = """<!DOCTYPE html>
-<html lang="fr"><head><meta charset="utf-8"><title>Git · Linux — fond d'écran (__THEME__)</title>
-<style>
-:root { __VARS__ }
-* { box-sizing:border-box; margin:0; padding:0; }
-html,body { width:2560px; height:1440px; overflow:hidden; }
-body {
-  font-family:"Inter",sans-serif; color:var(--text);
-  background:
-    linear-gradient(var(--grid) 1px, transparent 1px) 0 0/40px 40px,
-    linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/40px 40px,
-    linear-gradient(160deg, var(--bg), var(--bg2));
-  padding:56px 60px; display:flex; gap:44px;
-}
-.k, .tag, .brand small, .prompt { font-family:"MesloLGS Nerd Font","MesloLGS NF","MesloLGS Nerd Font Mono","DejaVu Sans Mono",monospace; }
-.zone { display:flex; flex-direction:column; gap:20px; min-width:0; }
-.zone.a { flex:3 1 0; }
-.zone.b { flex:2 1 0; }
-.brand { display:flex; align-items:center; gap:18px; height:54px; padding:0 4px; }
-.brand h2 { font-family:"Inter Display","Inter",sans-serif; font-weight:800; font-size:50px; letter-spacing:.04em; line-height:1; }
-.a .brand h2 { color:var(--a); }
-.b .brand h2 { color:var(--b); }
-.graph { width:120px; height:48px; }
-.prompt { color:var(--muted); font-weight:normal; letter-spacing:0; margin-right:16px; }
-.cursor { display:inline-block; width:22px; height:44px; background:var(--b); border-radius:2px; margin-left:8px; vertical-align:-4px; }
-.brand small { font-size:17px; color:var(--muted); margin-top:12px; }
-.brand small i { font-style:normal; color:var(--param); font-weight:bold; }
-.b .brand { justify-content:flex-end; }
-.cols { display:grid; gap:18px; flex:1; min-height:0; }
-.a .cols { grid-template-columns:repeat(3,minmax(0,1fr)); }
-.b .cols { grid-template-columns:repeat(2,minmax(0,1fr)); }
-.col { display:flex; flex-direction:column; justify-content:space-between; gap:14px; min-height:0; }
-.panel { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px 18px 13px; position:relative; }
-.panel::before { content:""; position:absolute; left:0; top:13px; bottom:13px; width:3px; border-radius:0 3px 3px 0; }
-.panel.a::before { background:var(--a); }
-.panel.b::before { background:var(--b); }
-.panel header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; gap:10px; }
-.panel h3 { font-size:20px; font-weight:700; white-space:nowrap; }
-.panel.a h3 { color:var(--a); }
-.panel.b h3 { color:var(--b); }
-.tag { font-size:16px; color:var(--muted); white-space:nowrap; }
-.rows { display:grid; grid-template-columns:var(--kw,178px) 1fr; column-gap:14px; align-items:baseline; }
-.k { font-size:17px; white-space:pre; line-height:26px; overflow:hidden; }
-.a .k { color:var(--a); }
-.b .k { color:var(--b); }
-.k i { font-style:normal; color:var(--param); }
-.d { font-size:16px; line-height:26px; white-space:nowrap; overflow:hidden; }
-.warn { color:var(--warn); font-weight:normal; }
-__COMMON_CSS__
-</style></head>
-<body>
-  <div class="zone a">
-    <div class="brand"><h2>GIT</h2>__SVG__
-      <small>préfixe « git » omis · <i>paramètres</i> · <span class="warn">⚠</span> destructif · <span class="ess-key"></span>essentiel</small></div>
-    <div class="cols">__ACOLS__</div>
-  </div>
-  <div class="zone b">
-    <div class="brand"><small>bash · coreutils · réseau · système</small><h2><span class="prompt">~$</span>LINUX<span class="cursor"></span></h2></div>
-    <div class="cols">__BCOLS__</div>
-  </div>
-</body></html>
-"""
+BRAND_GIT = ("<h2>GIT</h2>" + BRANCH_SVG +
+             '<small>préfixe « git » omis · <i>paramètres</i> · <span class="warn">⚠</span> destructif · '
+             '<span class="ess-key"></span>essentiel</small>')
+BRAND_LINUX = ('<small>bash · coreutils · réseau · système</small>'
+               '<h2><span class="prompt">~$</span>LINUX<span class="cursor"></span></h2>')
 
 if __name__ == "__main__":
-    OUT.mkdir(parents=True, exist_ok=True)
-    for name, vars_ in THEMES.items():
-        doc = (TEMPLATE.replace("__COMMON_CSS__", COMMON_CSS).replace("__THEME__", name).replace("__VARS__", vars_)
-               .replace("__SVG__", BRANCH_SVG)
-               .replace("__ACOLS__", columns(GIT, "a"))
-               .replace("__BCOLS__", columns(LINUX, "b")))
-        (OUT / f"git-linux-{name}.html").write_text(doc, encoding="utf-8")
-    print("ok")
+    build_two_zones("git-linux", "Git · Linux", ACCENTS, BRAND_GIT, BRAND_LINUX, GIT, LINUX)
