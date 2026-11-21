@@ -1,0 +1,12 @@
+# Généré par `make html`
+build/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Archives / éditeur
+*.zip
+.vscode/
+.idea/
