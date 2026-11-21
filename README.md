@@ -9,6 +9,7 @@ Fonds d'écran « cheat sheet » générés en code (HTML → PNG via Playwright
 - **Podman + virsh** : conteneurs, images, Containerfile, pods, Quadlet/systemd, et VM libvirt (cycle de vie, stockage, réseau, instantanés).
 - **Python** : langage (types, chaînes, compréhensions, classes, typage, stdlib, asyncio) et outils (venv, pip, uv, pytest, ruff, pdb).
 - **Rust** : langage (propriété, erreurs, itérateurs, traits, collections) et Cargo / rustup / crates courantes.
+- **Node.js** : JavaScript moderne, API Node (fs, path, process, fetch), et npm / CLI node / tests intégrés.
 
 Chacun existe en 4 thèmes : `aritim` (palette Aritim Dark de Konsole), `dark`, `light`, `amoled` (noir pur, texte atténué contre le marquage).
 
@@ -26,6 +27,7 @@ Chacun existe en 4 thèmes : `aritim` (palette Aritim Dark de Konsole), `dark`, 
 │   ├── build_podman_virsh.py        # Podman + virsh
 │   ├── build_python.py              # Python + outils
 │   ├── build_rust.py                # Rust + Cargo
+│   ├── build_nodejs.py              # Node.js + npm
 │   ├── common.py                    # rendu partagé, gabarit « deux zones », thèmes de base
 │   └── render.py                    # HTML → PNG 1440p et 4K, détection des débordements
 ├── wallpapers/

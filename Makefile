@@ -14,6 +14,7 @@ html:                ## Génère les pages HTML dans build/html/
 	$(PYTHON) src/build_podman_virsh.py
 	$(PYTHON) src/build_python.py
 	$(PYTHON) src/build_rust.py
+	$(PYTHON) src/build_nodejs.py
 
 png: html            ## Exporte les PNG 1440p et 4K dans wallpapers/
 	$(PYTHON) src/render.py
