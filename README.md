@@ -4,6 +4,7 @@ Fonds d'écran « cheat sheet » générés en code (HTML → PNG via Playwright
 
 - **Vim + Regex** : modes, déplacements, édition, objets textuels, macros… et regex PCRE/POSIX avec les spécificités Vim.
 - **Git + Linux** : commandes Git courantes (préfixe `git` omis) et outils shell (grep, find, sed, awk, jq, systemctl…).
+- **PowerShell + Windows** : cmdlets et alias PowerShell, cmd, outils Win+R, raccourcis clavier, WSL.
 
 Chacun existe en 4 thèmes : `aritim` (palette Aritim Dark de Konsole), `dark`, `light`, `amoled` (noir pur, texte atténué contre le marquage).
 
@@ -16,6 +17,7 @@ Chacun existe en 4 thèmes : `aritim` (palette Aritim Dark de Konsole), `dark`, 
 ├── src/
 │   ├── build_vim_regex.py           # Vim + Regex (mise en page dédiée)
 │   ├── build_git_linux.py           # Git + Linux
+│   ├── build_windows_powershell.py  # PowerShell + Windows
 │   ├── common.py                    # rendu partagé, gabarit « deux zones », thèmes de base
 │   └── render.py                    # HTML → PNG 1440p et 4K, détection des débordements
 ├── wallpapers/
