@@ -7,6 +7,7 @@ Fonds d'écran « cheat sheet » générés en code (HTML → PNG via Playwright
 - **PowerShell + Windows** : cmdlets et alias PowerShell, cmd, outils Win+R, raccourcis clavier, WSL.
 - **AS/400 (IBM i 7.4)** : commandes CL, navigation 5250, et Db2 for i (SQL, catalogue, services QSYS2).
 - **Podman + virsh** : conteneurs, images, Containerfile, pods, Quadlet/systemd, et VM libvirt (cycle de vie, stockage, réseau, instantanés).
+- **Python** : langage (types, chaînes, compréhensions, classes, typage, stdlib, asyncio) et outils (venv, pip, uv, pytest, ruff, pdb).
 
 Chacun existe en 4 thèmes : `aritim` (palette Aritim Dark de Konsole), `dark`, `light`, `amoled` (noir pur, texte atténué contre le marquage).
 
@@ -22,6 +23,7 @@ Chacun existe en 4 thèmes : `aritim` (palette Aritim Dark de Konsole), `dark`, 
 │   ├── build_windows_powershell.py  # PowerShell + Windows
 │   ├── build_as400.py               # AS/400 + Db2 for i
 │   ├── build_podman_virsh.py        # Podman + virsh
+│   ├── build_python.py              # Python + outils
 │   ├── common.py                    # rendu partagé, gabarit « deux zones », thèmes de base
 │   └── render.py                    # HTML → PNG 1440p et 4K, détection des débordements
 ├── wallpapers/
