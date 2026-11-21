@@ -10,6 +10,7 @@ html:                ## Génère les pages HTML dans build/html/
 	$(PYTHON) src/build_vim_regex.py
 	$(PYTHON) src/build_git_linux.py
 	$(PYTHON) src/build_windows_powershell.py
+	$(PYTHON) src/build_as400.py
 
 png: html            ## Exporte les PNG 1440p et 4K dans wallpapers/
 	$(PYTHON) src/render.py
