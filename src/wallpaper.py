@@ -437,7 +437,7 @@ def render(wp, theme, fmt="landscape", t=_identity, lang="en"):
             .replace("__CSS__", CSS.replace("__MONO__", MONO) + wp.css)
             .replace("__LANG__", lang).replace("__W__", str(w)).replace("__H__", str(h))
             .replace("__FORMAT__", fmt)
-            .replace("__TITLE__", esc(f"{wp.title} — {t('wallpaper')} ({theme})"))
+            .replace("__TITLE__", esc(f"{wp.title} — {t('cheat sheet')} ({theme})"))
             .replace("__VARS__", theme_vars(wp, theme))
             .replace("__BRAND_A__", brand_html(wp.left.brand, "a", t))
             .replace("__BRAND_B__", brand_html(wp.right.brand, "b", t))

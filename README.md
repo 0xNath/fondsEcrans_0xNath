@@ -39,7 +39,9 @@ wallpapers/fr/2560x1440/vim-regex-aritim.png
 │   ├── i18n.py              # catalogues de traduction et outils (check, update, new)
 │   ├── build.py             # écrit build/html/<langue>/<format>/*.html
 │   ├── render.py            # HTML → PNG, détection des débordements
-│   └── konsole_theme.py     # thème depuis un .colorscheme Konsole → themes/<nom>.json
+│   ├── konsole_theme.py     # thème depuis un .colorscheme Konsole → themes/<nom>.json
+│   └── kde.py               # paquets Plasma, script KWin, commande cheatsheet
+├── bin/cheatsheet           # change de sujet depuis un terminal
 ├── themes/konsole.json      # thème généré (make konsole-theme)
 ├── locales/
 │   └── fr.json              # {"texte anglais": "traduction"}
@@ -133,6 +135,34 @@ make i18n-new LOCALE=de      # crée locales/de.json avec tous les textes à tra
 make i18n-check              # avancement par langue
 make LOCALES=de              # génère wallpapers/de/
 ```
+
+## KDE Plasma
+
+```sh
+make install-kde                    # paquets + script KWin + commande cheatsheet
+make install-kde KDE_LANG=en KDE_DARK=amoled KDE_LIGHT=light
+make uninstall-kde
+```
+
+- **Paquets de fonds d'écran** : `~/.local/share/wallpapers/cheatsheet-<sujet>/`, un par sujet, avec
+  toutes les tailles (Plasma prend celle de chaque écran : un écran 1920×1080 reçoit le format compact,
+  un écran pivoté le portrait) et une variante claire (`KDE_LIGHT`) et sombre (`KDE_DARK`) choisie
+  selon le jeu de couleurs. Ils apparaissent dans Configurer le bureau › Fond d'écran.
+- **Raccourcis** (script KWin « cheatsheet », modifiables dans Configuration du système › Raccourcis › KWin) :
+
+  | Raccourci | Sujet | Raccourci | Sujet |
+  |---|---|---|---|
+  | `Meta+Alt+V` | Vim · Regex | `Meta+Alt+O` | Podman · virsh |
+  | `Meta+Alt+G` | Git · Linux | `Meta+Alt+Y` | Python |
+  | `Meta+Alt+W` | PowerShell · Windows | `Meta+Alt+R` | Rust |
+  | `Meta+Alt+A` | AS/400 | `Meta+Alt+N` | Node.js |
+  | `Meta+Alt+PgDown` | sujet suivant | `Meta+Alt+PgUp` | sujet précédent |
+
+- **Un sujet par bureau virtuel** (facultatif) :
+  `kwriteconfig6 --file kwinrc --group Script-cheatsheet --key desktopTopics "1=git-linux,2=python"`
+  puis `qdbus6 org.kde.KWin /KWin reconfigure`.
+- **Terminal** : `cheatsheet list`, `cheatsheet rust`, `cheatsheet next 1` (écran 1 seulement),
+  `cheatsheet current`.
 
 ## Polices
 

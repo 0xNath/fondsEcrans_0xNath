@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Change le fond d'écran aide-mémoire de Plasma (paquets installés par `make install-kde`).
+#
+#   cheatsheet list                  sujets disponibles
+#   cheatsheet <sujet> [écran]       ex. cheatsheet rust ; cheatsheet git-linux 1
+#   cheatsheet next|prev [écran]     sujet suivant / précédent
+#   cheatsheet current               sujet affiché sur chaque écran
+#
+# Écran : numéro Plasma (0, 1…) ; par défaut, tous les écrans.
+set -euo pipefail
+
+DIR="$HOME/.local/share/wallpapers"
+mapfile -t SLUGS < <(find "$DIR" -maxdepth 1 -type d -name 'cheatsheet-*' -printf '%f\n' | sed 's/^cheatsheet-//' | sort)
+[ ${#SLUGS[@]} -gt 0 ] || { echo "aucun paquet cheatsheet-* dans $DIR : lancer \`make install-kde\`" >&2; exit 1; }
+
+plasma() { qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "$1"; }
+
+current() {  # "écran sujet" pour chaque écran
+    plasma 'var o = []; desktops().forEach(function (d) { if (d.screen < 0) return;
+        d.currentConfigGroup = ["Wallpaper", "org.kde.image", "General"];
+        var m = String(d.readConfig("Image")).match(/cheatsheet-([\w-]+)/);
+        o.push(d.screen + " " + (m ? m[1] : "-")); }); print(o.join("\n"));'
+}
+
+show() {  # show <slug> [écran]
+    local path="file://$DIR/cheatsheet-$1/" screen="${2:-all}"
+    [ -d "$DIR/cheatsheet-$1" ] || { echo "sujet inconnu : $1 (voir \`cheatsheet list\`)" >&2; exit 1; }
+    plasma "desktops().forEach(function (d) { if (d.screen < 0) return;
+        if ('$screen' !== 'all' && d.screen !== Number('$screen')) return;
+        d.wallpaperPlugin = 'org.kde.image';
+        d.currentConfigGroup = ['Wallpaper', 'org.kde.image', 'General'];
+        d.writeConfig('Image', '$path'); });"
+}
+
+step() {  # step <+1|-1> [écran]
+    local screen="${2:-all}" cur i
+    cur=$(current | awk -v s="$screen" '$1 == s || s == "all" {print $2; exit}')
+    i=0
+    for k in "${!SLUGS[@]}"; do [ "${SLUGS[$k]}" = "$cur" ] && i=$k; done
+    show "${SLUGS[$(( (i + $1 + ${#SLUGS[@]}) % ${#SLUGS[@]} ))]}" "$screen"
+}
+
+case "${1:-}" in
+    list) printf '%s\n' "${SLUGS[@]}" ;;
+    current) current ;;
+    next) step 1 "${2:-all}" ;;
+    prev) step -1 "${2:-all}" ;;
+    ""|-h|--help) sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//' ;;
+    *) show "$1" "${2:-all}" ;;
+esac

@@ -8,10 +8,15 @@ JOBS   ?= 4
 SELECT = $(if $(LOCALES),--locale $(LOCALES)) $(if $(FORMATS),--format $(FORMATS)) \
          $(if $(THEMES),--theme $(THEMES)) $(if $(ONLY),--only $(ONLY))
 
+# Intégration KDE : langue, thème des images sombres / claires
+KDE_LANG  ?= fr
+KDE_DARK  ?= konsole
+KDE_LIGHT ?= light
+
 # Jeu de couleurs Konsole dont dérive le thème « konsole »
 KONSOLE_SCHEME ?= $(HOME)/.local/share/konsole/Aritim Dark.colorscheme
 
-.PHONY: all html png check setup clean i18n-check i18n-update i18n-new konsole-theme
+.PHONY: all html png check setup clean i18n-check i18n-update i18n-new konsole-theme install-kde uninstall-kde
 
 all: png
 
@@ -36,6 +41,13 @@ i18n-new:            ## Nouvelle langue : make i18n-new LOCALE=de
 
 konsole-theme:       ## (Re)crée themes/konsole.json depuis KONSOLE_SCHEME
 	$(PYTHON) src/konsole_theme.py "$(KONSOLE_SCHEME)" konsole
+
+install-kde:         ## Paquets Plasma, script KWin (raccourcis) et commande cheatsheet
+	$(MAKE) png LOCALES=$(KDE_LANG) THEMES=$(KDE_DARK),$(KDE_LIGHT)
+	$(PYTHON) src/kde.py install --lang $(KDE_LANG) --dark $(KDE_DARK) --light $(KDE_LIGHT)
+
+uninstall-kde:       ## Retire paquets, script KWin et commande
+	$(PYTHON) src/kde.py uninstall
 
 setup:               ## Crée le venv et installe Playwright
 	python3 -m venv $(VENV)
