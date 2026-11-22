@@ -19,7 +19,7 @@ VIM = [
         ]),
         ("Motions", "motion.txt", None, [
             ("§h j k l", "← ↓ ↑ →"),
-            ("§w  b  e  ge", "next / prev. word / end / prev. end"),
+            ("§w  b  e  ge", "word → / ← / end / ← end"),
             ("W  B  E", "same, for WORDS"),
             ("gj  gk", "display line (wrapped text)"),
             ("§0  ^  $", "start / 1st char / end of line"),
@@ -204,7 +204,7 @@ REGEX = [
             ("i", "case-insensitive"),
             ("m", "^ and $ at each line"),
             ("s", ". matches newline"),
-            ("x", "extended mode (spaces ignored)"),
+            ("x", "extended (spaces ignored)"),
             ("g", "all matches (JS, sed)"),
             ("(?i)", "inline flag in the pattern"),
         ]),

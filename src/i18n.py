@@ -60,7 +60,7 @@ def source_keys():
     from wallpaper import render
     t = Translator(SOURCE)
     for wp in load_wallpapers():
-        render(wp, "dark", "landscape", t)
+        render(wp, "dark", "landscape", t)  # tous les textes y figurent
     return list(t.used)
 
 

@@ -15,7 +15,7 @@ POWERSHELL = [
             ("Get-Command -Noun «name»", "by noun"),
             ("Get-Command «cmd» -Syntax", "syntax"),
             ("§«obj» | Get-Member", "properties / methods"),
-            ("Get-Alias «alias»", "cmdlet behind the alias"),
+            ("Get-Alias «alias»", "alias → cmdlet"),
             ("Get-Verb", "approved verbs"),
             ("Update-Help", "update help"),
             ("$PSVersionTable", "PowerShell version"),

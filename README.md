@@ -13,8 +13,10 @@ Fonds d'écran « cheat sheet » générés en code (HTML → PNG via Playwright
 
 Chacun existe :
 
-- en **4 thèmes** : `aritim` (palette Aritim Dark de Konsole), `dark`, `light`, `amoled` (noir pur, texte atténué contre le marquage) ;
-- en **2 orientations** : paysage (2560×1440 et 3840×2160) et portrait (1440×2560 et 2160×3840) ;
+- en **5 thèmes** : `aritim` (palette Plasma Aritim Dark), `dark`, `light`, `amoled` (noir pur, texte atténué
+  contre le marquage) et `konsole`, généré depuis le jeu de couleurs Konsole (voir plus bas) ;
+- en **3 formats** : paysage (2560×1440 et 3840×2160), portrait (1440×2560 et 2160×3840) et compact
+  (1920×1080 : 4 colonnes, seulement les lignes essentielles et les premières de chaque panneau) ;
 - en **2 langues** pour l'instant : anglais (`en`) et français (`fr`).
 
 ```
@@ -35,8 +37,10 @@ wallpapers/fr/2560x1440/vim-regex-aritim.png
 │   │   └── …
 │   ├── wallpaper.py         # modèle, thèmes, gabarit HTML paysage / portrait
 │   ├── i18n.py              # catalogues de traduction et outils (check, update, new)
-│   ├── build.py             # écrit build/html/<langue>/<orientation>/*.html
-│   └── render.py            # HTML → PNG, détection des débordements
+│   ├── build.py             # écrit build/html/<langue>/<format>/*.html
+│   ├── render.py            # HTML → PNG, détection des débordements
+│   └── konsole_theme.py     # thème depuis un .colorscheme Konsole → themes/<nom>.json
+├── themes/konsole.json      # thème généré (make konsole-theme)
 ├── locales/
 │   └── fr.json              # {"texte anglais": "traduction"}
 ├── wallpapers/              # PNG générés
@@ -58,7 +62,7 @@ make clean        # supprime build/
 Chaque cible accepte une sélection (valeurs séparées par des virgules) :
 
 ```sh
-make LOCALES=fr ORIENTATIONS=portrait ONLY=rust,python
+make LOCALES=fr FORMATS=portrait,compact THEMES=konsole ONLY=rust,python
 ```
 
 Le rendu utilise le Chrome/Chromium du système (ou `CHROME_PATH=/chemin/vers/chrome make`).
@@ -86,10 +90,18 @@ Après une modification de texte : `make i18n-update` ajoute les nouveaux textes
 liste ce qui manque.
 
 En **paysage**, les colonnes sont celles du module ; en **portrait**, les deux zones sont empilées
-et la zone de droite est redistribuée automatiquement sur 3 colonnes.
+et la zone de droite est redistribuée automatiquement sur 3 colonnes ; en **compact**, chaque zone
+passe sur 2 colonnes et les lignes non essentielles (sans `§`) sont retirées en partant de la fin
+des plus gros panneaux jusqu'à ce que tout tienne.
 
 Thèmes : les couleurs de fond et de texte sont dans `BASE_THEMES` (`src/wallpaper.py`) ; chaque
 fond d'écran n'ajoute que ses accents dans `ACCENTS` (`--a` zone gauche, `--b` zone droite, `--param`).
+
+Thème **konsole** : `make konsole-theme` lit `KONSOLE_SCHEME` (par défaut
+`~/.local/share/konsole/Aritim Dark.colorscheme`) et écrit `themes/konsole.json` : fond, texte et
+sélection du terminal ; les accents de chaque fond d'écran sont pris dans la palette du terminal
+(teinte la plus proche de ses accents « dark », éclaircie si besoin pour un contraste WCAG AA).
+Tout fichier `themes/<nom>.json` devient un thème.
 
 **Nouveau fond d'écran** : copier un module de `src/content/` (par ex. `git_linux.py`) et changer
 le contenu, les accents et le `slug`. Il est détecté automatiquement ; `make i18n-update` ajoute
@@ -125,4 +137,5 @@ make LOCALES=de              # génère wallpapers/de/
 ## Polices
 
 - Commandes : **MesloLGS Nerd Font** (repli : DejaVu Sans Mono).
-- Titres et descriptions : Inter (repli : sans-serif du système).
+- Titres et descriptions : **Inter** et Inter Display (repli : sans-serif du système, plus large :
+  vérifier avec `make check` si la police change).
