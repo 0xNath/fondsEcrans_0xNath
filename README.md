@@ -11,29 +11,36 @@ Fonds d'écran « cheat sheet » générés en code (HTML → PNG via Playwright
 - **Rust** : langage (propriété, erreurs, itérateurs, traits, collections) et Cargo / rustup / crates courantes.
 - **Node.js** : JavaScript moderne, API Node (fs, path, process, fetch), et npm / CLI node / tests intégrés.
 
-Chacun existe en 4 thèmes : `aritim` (palette Aritim Dark de Konsole), `dark`, `light`, `amoled` (noir pur, texte atténué contre le marquage).
+Chacun existe :
 
-![Aperçu Vim + Regex (Aritim)](wallpapers/1440p/vim-regex-aritim.png)
+- en **4 thèmes** : `aritim` (palette Aritim Dark de Konsole), `dark`, `light`, `amoled` (noir pur, texte atténué contre le marquage) ;
+- en **2 orientations** : paysage (2560×1440 et 3840×2160) et portrait (1440×2560 et 2160×3840) ;
+- en **2 langues** pour l'instant : anglais (`en`) et français (`fr`).
+
+```
+wallpapers/<langue>/<largeur>x<hauteur>/<fond-d'écran>-<thème>.png
+wallpapers/fr/2560x1440/vim-regex-aritim.png
+```
+
+![Aperçu Vim + Regex (Aritim, français)](wallpapers/fr/2560x1440/vim-regex-aritim.png)
 
 ## Arborescence
 
 ```
 .
 ├── src/
-│   ├── build_vim_regex.py           # Vim + Regex (mise en page dédiée)
-│   ├── build_git_linux.py           # Git + Linux
-│   ├── build_windows_powershell.py  # PowerShell + Windows
-│   ├── build_as400.py               # AS/400 + Db2 for i
-│   ├── build_podman_virsh.py        # Podman + virsh
-│   ├── build_python.py              # Python + outils
-│   ├── build_rust.py                # Rust + Cargo
-│   ├── build_nodejs.py              # Node.js + npm
-│   ├── common.py                    # rendu partagé, gabarit « deux zones », thèmes de base
-│   └── render.py                    # HTML → PNG 1440p et 4K, détection des débordements
-├── wallpapers/
-│   ├── 1440p/                       # 2560×1440
-│   └── 4k/                          # 3840×2160
-├── build/html/                      # pages HTML intermédiaires (généré, ignoré par git)
+│   ├── content/             # un module par fond d'écran (textes en anglais)
+│   │   ├── vim_regex.py
+│   │   ├── git_linux.py
+│   │   └── …
+│   ├── wallpaper.py         # modèle, thèmes, gabarit HTML paysage / portrait
+│   ├── i18n.py              # catalogues de traduction et outils (check, update, new)
+│   ├── build.py             # écrit build/html/<langue>/<orientation>/*.html
+│   └── render.py            # HTML → PNG, détection des débordements
+├── locales/
+│   └── fr.json              # {"texte anglais": "traduction"}
+├── wallpapers/              # PNG générés
+├── build/html/              # pages HTML intermédiaires (généré, ignoré par git)
 ├── Makefile
 └── requirements.txt
 ```
@@ -41,39 +48,79 @@ Chacun existe en 4 thèmes : `aritim` (palette Aritim Dark de Konsole), `dark`, 
 ## Utilisation
 
 ```sh
-make setup   # une fois : crée .venv et installe Playwright
-make         # génère le HTML puis tous les PNG
-make html    # HTML seulement (aperçu rapide dans un navigateur à 2560×1440)
-make clean   # supprime build/
+make setup        # une fois : crée .venv et installe Playwright
+make              # génère le HTML puis tous les PNG
+make check        # vérifie seulement les débordements (quelques secondes)
+make html         # HTML seulement (aperçu dans un navigateur)
+make clean        # supprime build/
+```
+
+Chaque cible accepte une sélection (valeurs séparées par des virgules) :
+
+```sh
+make LOCALES=fr ORIENTATIONS=portrait ONLY=rust,python
 ```
 
 Le rendu utilise le Chrome/Chromium du système (ou `CHROME_PATH=/chemin/vers/chrome make`).
-À défaut : `.venv/bin/python -m playwright install chromium`.
+À défaut : `.venv/bin/python -m playwright install chromium`. `JOBS=8 make` règle le parallélisme.
 
 `render.py` échoue si un texte déborde de son bloc ou entre dans la marge de sécurité du bas :
-après une modification du contenu, raccourcir la ligne ou retirer une entrée.
+raccourcir le texte (dans la langue concernée) ou retirer une entrée.
 
 ## Modifier le contenu
 
-Les listes de commandes sont en tête de chaque `src/build_*.py`.
-Chaque panneau : `(titre, étiquette, largeur colonne commande en px ou None, lignes)`.
+Le contenu est dans `src/content/<fond_d_écran>.py`, **en anglais** (langue source).
+Chaque panneau : `(titre, étiquette, largeur colonne commande en px ou None, lignes)`,
+chaque ligne : `(commande, description)`.
 
-Conventions dans les lignes (voir `src/common.py`) :
+| Syntaxe              | Effet                                                   |
+|----------------------|---------------------------------------------------------|
+| `"§cmd"`             | commande essentielle (surlignée, en gras)               |
+| `«x»`                | paramètre (couleur secondaire ; traduit dès 2 lettres)  |
+| `"⚠ desc"`           | commande destructive                                    |
+| `"desc [GNU]"`       | badge de compatibilité en fin de ligne                  |
+| `T("…")`             | étiquette ou titre de bandeau à traduire (sinon : code) |
 
-| Syntaxe              | Effet                                       |
-|----------------------|---------------------------------------------|
-| `"§cmd"`             | commande essentielle (surlignée, en gras)   |
-| `«x»`                | paramètre (couleur secondaire)              |
-| `"⚠ desc"`           | commande destructive                        |
-| `"desc [GNU]"`       | badge de compatibilité en fin de ligne      |
+Après une modification de texte : `make i18n-update` ajoute les nouveaux textes aux catalogues
+(valeur vide = anglais affiché), puis les traduire dans `locales/*.json`. `make i18n-check`
+liste ce qui manque.
 
-Thèmes : les couleurs de fond et de texte sont dans `BASE_THEMES` (`src/common.py`) ; chaque
-script n'ajoute que ses accents dans `ACCENTS` (`--a` zone gauche, `--b` zone droite, `--param`).
-Vim/Regex garde son propre dictionnaire `THEMES`.
+En **paysage**, les colonnes sont celles du module ; en **portrait**, les deux zones sont empilées
+et la zone de droite est redistribuée automatiquement sur 3 colonnes.
 
-Nouveau fond d'écran : copier un script à gabarit « deux zones » (par ex. `src/build_git_linux.py`),
-changer le contenu, les accents et le slug,
-puis l'ajouter à la cible `html` du `Makefile`.
+Thèmes : les couleurs de fond et de texte sont dans `BASE_THEMES` (`src/wallpaper.py`) ; chaque
+fond d'écran n'ajoute que ses accents dans `ACCENTS` (`--a` zone gauche, `--b` zone droite, `--param`).
+
+**Nouveau fond d'écran** : copier un module de `src/content/` (par ex. `git_linux.py`) et changer
+le contenu, les accents et le `slug`. Il est détecté automatiquement ; `make i18n-update` ajoute
+ses textes aux catalogues.
+
+## Traductions
+
+`locales/<code>.json` associe chaque texte anglais à sa traduction :
+
+```json
+{
+  "search recursively": "chercher récursivement",
+  "in place [GNU]": "en place [GNU]",
+  "«file»": "«fichier»"
+}
+```
+
+- Garder les badges `[…]` en fin de texte, le `⚠ ` en tête et les `{m}` des légendes.
+- Les paramètres gardent leurs guillemets `«…»` dans la clé comme dans la traduction.
+- Un même texte anglais a une seule traduction : si deux contextes demandent deux traductions
+  différentes, écrire deux textes anglais différents.
+- Les textes doivent tenir dans leur colonne : `make check LOCALES=<code>` le vérifie.
+
+**Ajouter une langue** (ex. allemand) :
+
+```sh
+make i18n-new LOCALE=de      # crée locales/de.json avec tous les textes à traduire
+# … remplir les valeurs (une valeur vide affiche l'anglais) …
+make i18n-check              # avancement par langue
+make LOCALES=de              # génère wallpapers/de/
+```
 
 ## Polices
 

@@ -1,0 +1,262 @@
+"""Podman + virsh (libvirt / QEMU-KVM), préfixes omis.
+
+Textes en anglais (langue source) ; traductions dans locales/<langue>.json.
+Conventions : voir src/wallpaper.py.
+"""
+
+from wallpaper import Brand, T, Wallpaper, Zone
+
+PODMAN = [
+    [  # colonne 1
+        ("Containers", "podman run · ps", 250, [
+            ("§run -it --rm «img» sh", "interactive, throwaway"),
+            ("§run -d --name «n» «img»", "in the background"),
+            ("§run -p 8080:80 «img»", "publish a port"),
+            ("run -v «dir»:/data:Z", "volume (SELinux :Z)"),
+            ("run -e «VAR»=«v»", "environment variable"),
+            ("run --env-file .env", "variables file"),
+            ("§ps  ps -a", "running / all"),
+            ("§start  stop «c»", "start / stop"),
+            ("restart «c»", "restart"),
+            ("pause  unpause «c»", "freeze / unfreeze"),
+            ("attach «c»", "attach (Ctrl-p q)"),
+            ("wait «c»", "wait for exit"),
+            ("rename «a» «b»", "rename"),
+            ("commit «c» «img»", "container → image"),
+            ("rm -f «c»", "⚠ force remove"),
+        ]),
+        ("run options", "", 250, [
+            ("--restart=always", "restart if stopped"),
+            ("--replace", "replace existing"),
+            ("-m 512m  --cpus 1.5", "limit RAM / CPU"),
+            ("-w «dir»", "working directory"),
+            ("-u «uid»", "user"),
+            ("--entrypoint «cmd»", "override entrypoint"),
+            ("§--userns=keep-id", "keep my UID"),
+            ("--read-only", "read-only root"),
+            ("--cap-add «CAP»", "add a capability"),
+            ("--init", "init (signals, zombies)"),
+            ("--pull=newer", "pull newer image"),
+            ("--device /dev/«x»", "host device"),
+        ]),
+        ("Images", "podman image", 250, [
+            ("§images", "local images"),
+            ("§pull «img»:«tag»", "download"),
+            ("§build -t «img» .", "build the image"),
+            ("build -f «file» .", "other Containerfile"),
+            ("build --no-cache", "without cache"),
+            ("tag «img» «reg»/«img»", "tag"),
+            ("push «reg»/«img»", "publish"),
+            ("history «img»", "layers"),
+            ("save -o «f».tar «img»", "export (load -i)"),
+            ("rmi «img»", "⚠ remove the image"),
+        ]),
+    ],
+    [  # colonne 2
+        ("Inspect & debug", "", 250, [
+            ("§logs -f «c»", "live logs"),
+            ("logs --since 10m «c»", "last 10 minutes"),
+            ("logs --tail 50 «c»", "last 50 lines"),
+            ("§exec -it «c» sh", "shell in the container"),
+            ("inspect «c»", "JSON details"),
+            ("inspect -f '{{.«Field»}}'", "a single field"),
+            ("top «c»", "processes"),
+            ("§stats", "live CPU / RAM"),
+            ("port «c»", "published ports"),
+            ("diff «c»", "changed files"),
+            ("cp «c»:«src» «dst»", "copy to the host"),
+            ("events", "event stream"),
+            ("healthcheck run «c»", "run the healthcheck"),
+        ]),
+        ("Containerfile", "", 250, [
+            ("FROM «img»:«tag»", "base image"),
+            ("RUN «cmd»", "command (1 layer)"),
+            ("COPY «src» «dst»", "copy into the image"),
+            ("WORKDIR «dir»", "current directory"),
+            ("ENV «VAR»=«v»", "environment variable"),
+            ("ARG «name»", "--build-arg name=…"),
+            ("EXPOSE «port»", "documented port"),
+            ("USER «uid»", "don't run as root"),
+            ('§ENTRYPOINT ["«bin»"]', "program to run"),
+            ('CMD ["«arg»"]', "default arguments"),
+        ]),
+        ("Kubernetes & Compose", "", 250, [
+            ("§kube generate «p» > p.yaml", "pod → YAML"),
+            ("§kube play «f».yaml", "run from YAML"),
+            ("kube down «f».yaml", "stop and remove"),
+            ("compose up -d", "compose file"),
+            ("compose down", "stop"),
+            ("compose logs -f", "logs of all services"),
+        ]),
+        ("Cleanup & system", "", 250, [
+            ("§system df", "space used"),
+            ("system df -v", "per-object detail"),
+            ("info", "config, rootless"),
+            ("container prune", "⚠ remove stopped"),
+            ("image prune -a", "⚠ remove unused"),
+            ("system prune -a", "⚠ clean everything"),
+            ("system reset", "⚠ full reset"),
+        ]),
+    ],
+    [  # colonne 3
+        ("Pods", "podman pod", 250, [
+            ("§pod create -n «p» -p «port»", "create (ports on pod)"),
+            ("§run -d --pod «p» «img»", "add a container"),
+            ("pod ps", "list pods"),
+            ("pod start  stop «p»", "start / stop"),
+            ("pod logs -f «p»", "logs of the whole pod"),
+            ("pod stats «p»", "resources"),
+            ("pod top «p»", "pod processes"),
+            ("pod inspect «p»", "details"),
+            ("pod rm -f «p»", "⚠ pod + containers"),
+        ]),
+        ("Volumes, networks, secrets", "", 250, [
+            ("volume ls", "volumes"),
+            ("volume create «v»", "create"),
+            ("volume inspect «v»", "mount point"),
+            ("volume prune", "⚠ prune unused"),
+            ("network ls", "networks"),
+            ("§network create «net»", "create a network"),
+            ("network inspect «net»", "subnet, gw"),
+            ("§run --network «net»", "attach (DNS)"),
+            ("network connect «net» «c»", "connect a container"),
+            ("secret create «s» «f»", "create a secret"),
+            ("secret ls", "list secrets"),
+            ("run --secret «s»", "in /run/secrets"),
+            ("unshare «cmd»", "rootless namespace"),
+        ]),
+        ("Quadlet & systemd", "systemctl --user", 250, [
+            ("«name».container", "Quadlet unit"),
+            (".pod  .volume  .network", "other types"),
+            ("…/containers/systemd/", "directory (~/.config)"),
+            ("Image=  PublishPort=", "Container keys"),
+            ("WantedBy=default.target", "autostart"),
+            ("§daemon-reload", "generate services"),
+            ("§start  status «name»", "start / status"),
+            ("journalctl --user -u «n»", "service logs"),
+            ("loginctl enable-linger", "survive logout"),
+            ("podman auto-update", "update images"),
+        ]),
+        ("Registries", "", 250, [
+            ("search «name»", "search for an image"),
+            ("login  logout «reg»", "log in"),
+            ("pull docker.io/«img»", "fully qualified name"),
+            ("registries.conf", "search registries"),
+        ]),
+    ],
+]
+
+VIRSH = [
+    [  # colonne 1
+        ("Virtual machines", "virsh", 230, [
+            ("§list --all", "all VMs"),
+            ("§start «vm»", "start"),
+            ("§shutdown «vm»", "clean shutdown (ACPI)"),
+            ("reboot «vm»", "restart"),
+            ("destroy «vm»", "⚠ pull the plug"),
+            ("suspend  resume «vm»", "pause / resume"),
+            ("autostart «vm»", "start with the host"),
+            ("autostart --disable «vm»", "… stop autostarting"),
+            ("§console «vm»", "serial console (Ctrl-])"),
+            ("managedsave «vm»", "save to disk"),
+            ("domrename «a» «b»", "rename"),
+            ("undefine «vm»", "⚠ delete the definition"),
+        ]),
+        ("Inspect", "", 230, [
+            ("§dominfo «vm»", "state, CPU, memory"),
+            ("§domifaddr «vm»", "IP address"),
+            ("domstate «vm»", "state"),
+            ("domblklist «vm»", "disks"),
+            ("domiflist «vm»", "network interfaces"),
+            ("vncdisplay «vm»", "VNC port"),
+            ("domdisplay «vm»", "VNC / Spice URI"),
+            ("dommemstat «vm»", "guest memory"),
+            ("domstats «vm»", "statistics"),
+            ("dumpxml «vm»", "XML definition"),
+        ]),
+        ("Configuration", "", 230, [
+            ("§edit «vm»", "edit the XML"),
+            ("define «f».xml", "create / update from XML"),
+            ("create «f».xml", "run without defining"),
+            ("setvcpus «vm» «n»", "vCPUs (+ --config)"),
+            ("setmem «vm» «2G»", "memory (≤ max)"),
+            ("setmaxmem «vm» «4G»", "max memory"),
+            ("attach-disk «vm» «f» vdb", "attach a disk"),
+            ("detach-disk «vm» vdb", "detach a disk"),
+            ("change-media «vm» «dev»", "change ISO"),
+        ]),
+        ("Snapshots", "", 280, [
+            ("§snapshot-create-as «vm» «s»", "create"),
+            ("snapshot-list «vm»", "list snapshots"),
+            ("§snapshot-revert «vm» «s»", "revert to s"),
+            ("snapshot-current «vm»", "current snapshot"),
+            ("snapshot-delete «vm» «s»", "⚠ delete"),
+        ]),
+    ],
+    [  # colonne 2
+        ("Storage", "", 260, [
+            ("§pool-list --all", "storage pools"),
+            ("§vol-list «pool»", "volumes in the pool"),
+            ("vol-path «v» --pool «p»", "file path"),
+            ("vol-create-as «p» «v» 20G", "create a volume"),
+            ("vol-resize «v» 30G --pool «p»", "grow"),
+            ("vol-delete «v» --pool «p»", "⚠ delete"),
+            ("pool-refresh «pool»", "rescan"),
+            ("pool-start «pool»", "start a pool"),
+            ("qemu-img info «f».qcow2", "disk info"),
+            ("qemu-img resize «f» +10G", "grow a file"),
+        ]),
+        ("Network", "", 260, [
+            ("§net-list --all", "virtual networks"),
+            ("net-start default", "start the NAT"),
+            ("net-autostart default", "… at boot"),
+            ("net-info «net»", "state, bridge"),
+            ("§net-dhcp-leases default", "VM IPs (DHCP)"),
+            ("net-edit «net»", "edit the XML"),
+            ("net-destroy «net»", "stop the network"),
+        ]),
+        ("Connection & migration", "", 260, [
+            ("-c qemu:///system", "system VMs"),
+            ("-c qemu:///session", "user VMs"),
+            ("-c qemu+ssh://«h»/system", "remote host"),
+            ("§uri", "current connection"),
+            ("migrate --live «vm» «uri»", "live migration"),
+        ]),
+        ("Host", "", 260, [
+            ("version", "libvirt / QEMU"),
+            ("hostname", "host name"),
+            ("§nodeinfo", "host CPU / RAM"),
+            ("nodememstats", "detailed memory"),
+            ("capabilities", "capabilities (XML)"),
+        ]),
+        ("virt-* tools", "", 260, [
+            ("§virt-install …", "create a VM"),
+            ("osinfo-query os", "--osinfo values"),
+            ("virt-clone -o «vm» …", "clone a VM"),
+            ("virt-viewer «vm»", "show the display"),
+            ("virt-manager", "graphical interface"),
+        ]),
+    ],
+]
+
+ACCENTS = {
+    "aritim": "--a:#b27cd6; --b:#3daee9; --param:#fdbc4b;",
+    "dark":   "--a:#c49bff; --b:#6fd3e6; --param:#f3d36a;",
+    "light":  "--a:#6a3fb5; --b:#0a6678; --param:#8a5500;",
+    "amoled": "--a:#a98fe6; --b:#58b5c7; --param:#d6b35a;",
+}
+
+POD_SVG = """<svg class="graph" viewBox="0 0 120 48" aria-hidden="true">
+  <rect x="4" y="4" width="112" height="40" rx="12" fill="none" stroke="var(--a)" stroke-width="3" stroke-dasharray="7 5"/>
+  <rect x="16" y="14" width="22" height="20" rx="4" fill="var(--a)"/>
+  <rect x="49" y="14" width="22" height="20" rx="4" fill="var(--a)"/>
+  <rect x="82" y="14" width="22" height="20" rx="4" fill="var(--param)"/>
+</svg>"""
+
+WALLPAPER = Wallpaper(
+    slug="podman-virsh",
+    title="Podman · virsh",
+    accents=ACCENTS,
+    left=Zone(Brand("PODMAN", svg=POD_SVG, note='"podman" prefix omitted'), PODMAN),
+    right=Zone(Brand("LIBVIRT", prompt="virsh #", note='"virsh" omitted · QEMU/KVM'), VIRSH),
+)
